@@ -109,6 +109,12 @@ def find_merge_base(commits: List[str], cwd: str=None) -> str:
     """
     Find the "best common ancestor" commit.
     """
+    if len(commits) == 0:
+        raise Exception('Called find_merge_base with no commits!')
+
+    if len(commits) == 1:
+        return commits[0]
+
     base = _run(['git', 'merge-base', *commits], cwd=cwd)
     return base
 
