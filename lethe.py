@@ -40,6 +40,13 @@ def get_latest_commit(short: bool=True, cwd: str=None) -> str:
     return _run('git log --all -1 --format=%{}'.format(fmt), cwd=cwd)
 
 
+def shorten_hash(sha: str, cwd: str=None) -> str:
+    """
+    Get the short version of a hash
+    """
+    return _run('git rev-parse --short {}'.format(sha), cwd=cwd)
+
+
 def get_root(cwd: str=None) -> str:
     """
     Get the root directory of a git repository
