@@ -45,7 +45,7 @@ def get_obj(ref: str, cwd: str=None) -> str:
     """
     Transform a ref into its corresponding hash using git-rev-parse
     """
-    sha =  _run('git rev-parse --quiet --verify'.split() + [ref], cwd=cwd)
+    sha = _run('git rev-parse --quiet --verify'.split() + [ref], cwd=cwd)
     return sha
 
 
@@ -127,7 +127,7 @@ def snap_tree(cwd: str=None) -> str:
     with tempfile.TemporaryDirectory() as tmp_dir:
         env = {'GIT_INDEX_FILE': tmp_dir + '/git-snapshot-index'}
 
-        # TODO: Mayve need cwd=get_root(cwd) here?
+        # TODO: Maybe need cwd=get_root(cwd) here?
         _run('git add --all', env=env, cwd=cwd)
         tree = _run('git write-tree', env=env, cwd=cwd)
     return tree
