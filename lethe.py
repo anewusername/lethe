@@ -31,6 +31,15 @@ def _run(command: str or List[str], **kwargs):
     return result.stdout.decode().strip()
 
 
+def get_latest_commit(short: bool=True, cwd: str=None) -> str:
+    """
+    Get the most recent commit's hash.
+    This includes non-lethe commits.
+    """
+    fmt = 'h' if short else 'H'
+    return _run('git log --all -1 --format=%{}'.format(fmt), cwd=cwd)
+
+
 def get_root(cwd: str=None) -> str:
     """
     Get the root directory of a git repository
