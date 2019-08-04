@@ -20,7 +20,7 @@ def _run(command: str or List[str], **kwargs):
     """
     Wrapper for subprocess.run():
     - Accepts args as either a list of strings or space-delimited string
-    - Captures and returns stdouti
+    - Captures and returns stdout
     """
     if isinstance(command, str):
         args = command.split()
