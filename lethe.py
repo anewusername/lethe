@@ -13,7 +13,7 @@ import sys
 
 
 __author__ = 'Jan Petykeiwicz'
-version = 0.6
+version = 0.7
 
 
 def _run(command: str or List[str], **kwargs):
