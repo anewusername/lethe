@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
 from setuptools import setup
-import lethe
 
 with open('README.md', 'r') as f:
     long_description = f.read()
 
 setup(name='lethe',
-      version=lethe.version,
+      version='0.8',
       description='Git-based snapshotting',
       long_description=long_description,
       long_description_content_type='text/markdown',
