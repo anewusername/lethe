@@ -3,12 +3,12 @@
 Git snapshotting tool
 """
 
+from typing import List, Union
 import subprocess
 import tempfile
 import datetime
 import argparse
 from itertools import chain
-from typing import List
 import sys
 
 
@@ -16,7 +16,7 @@ __author__ = 'Jan Petykeiwicz'
 __version__ = '0.8'
 
 
-def _run(command: str or List[str], **kwargs):
+def _run(command: Union[str, List[str]], **kwargs) -> str:
     """
     Wrapper for subprocess.run():
     - Accepts args as either a list of strings or space-delimited string
