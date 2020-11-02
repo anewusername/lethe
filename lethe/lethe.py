@@ -3,18 +3,18 @@
 Git snapshotting tool
 """
 
-from typing import List, Union
+from typing import List, Union, Optional
 import subprocess
 import tempfile
 import datetime
 import argparse
 from itertools import chain
-import sys
 
 
 def _run(command: Union[str, List[str]], **kwargs) -> str:
     """
-    Wrapper for subprocess.run():
+    Wrapper for `subprocess.run()`:
+
     - Accepts args as either a list of strings or space-delimited string
     - Captures and returns stdout
     """
@@ -27,7 +27,7 @@ def _run(command: Union[str, List[str]], **kwargs) -> str:
     return result.stdout.decode().strip()
 
 
-def get_latest_commit(short: bool=True, cwd: str=None) -> str:
+def get_latest_commit(short: bool = True, cwd: Optional[str] = None) -> str:
     """
     Get the most recent commit's hash.
     This includes non-lethe commits.
@@ -36,14 +36,14 @@ def get_latest_commit(short: bool=True, cwd: str=None) -> str:
     return _run('git log --all -1 --format=%{}'.format(fmt), cwd=cwd)
 
 
-def shorten_hash(sha: str, cwd: str=None) -> str:
+def shorten_hash(sha: str, cwd: Optional[str] = None) -> str:
     """
     Get the short version of a hash
     """
     return _run('git rev-parse --short {}'.format(sha), cwd=cwd)
 
 
-def get_root(cwd: str=None) -> str:
+def get_root(cwd: Optional[str] = None) -> str:
     """
     Get the root directory of a git repository
     """
@@ -53,7 +53,7 @@ def get_root(cwd: str=None) -> str:
     return root
 
 
-def get_obj(ref: str, cwd: str=None) -> str:
+def get_obj(ref: str, cwd: Optional[str] = None) -> str:
     """
     Transform a ref into its corresponding hash using git-rev-parse
     """
@@ -61,14 +61,14 @@ def get_obj(ref: str, cwd: str=None) -> str:
     return sha
 
 
-def get_commit(ref: str, cwd: str=None) -> str:
+def get_commit(ref: str, cwd: Optional[str] = None) -> str:
     """
     Transform a ref to a commit into its corresponding hash using git-rev-parse
     """
     return get_obj(ref, cwd=cwd)
 
 
-def get_tree(ref: str, cwd: str=None) -> str:
+def get_tree(ref: str, cwd: Optional[str] = None) -> str:
     """
     Take a ref to a commit, and return the hash of the tree it points to
     """
@@ -77,8 +77,8 @@ def get_tree(ref: str, cwd: str=None) -> str:
 
 def commit_tree(tree: str,
                 parents: List[str],
-                message: str = None,
-                cwd: str = None,
+                message: Optional[str] = None,
+                cwd: Optional[str] = None,
                 ) -> str:
     """
     Create a commit pointing to the given tree, with the specified parent commits and message.
@@ -94,13 +94,13 @@ def commit_tree(tree: str,
 
 def update_ref(target_ref: str,
                target_commit: str,
-               old_commit: str = None,
+               old_commit: Optional[str] = None,
                message: str = 'new snapshot',
-               cwd: str = None,
+               cwd: Optional[str] = None,
                ) -> str:
     """
-    Update target_ref to point to target_commit, optionally verifying that
-        it points old_commit before the update.
+    Update `target_ref` to point to `target_commit`, optionally verifying that
+        it points `old_commit` before the update.
     Returns the resulting ref.
     """
     cmd = ['git', 'update-ref', '-m', message, target_ref, target_commit]
@@ -110,14 +110,14 @@ def update_ref(target_ref: str,
     return result_ref
 
 
-def deref_symref(ref: str, cwd: str=None) -> str:
+def deref_symref(ref: str, cwd: Optional[str] = None) -> str:
     """
     Dereference a symbolic ref
     """
     return _run(['git', 'symbolic-ref', '--quiet', ref], cwd=cwd)
 
 
-def find_merge_base(commits: List[str], cwd: str=None) -> str:
+def find_merge_base(commits: List[str], cwd: Optional[str] = None) -> str:
     """
     Find the "best common ancestor" commit.
     """
@@ -131,7 +131,7 @@ def find_merge_base(commits: List[str], cwd: str=None) -> str:
     return base
 
 
-def snap_tree(cwd: str=None) -> str:
+def snap_tree(cwd: Optional[str] = None) -> str:
     """
     Create a new tree, consisting of all non-ignored files in the repository.
     Return the hash of the tree.
@@ -147,11 +147,11 @@ def snap_tree(cwd: str=None) -> str:
 
 def snap_ref(parent_refs: List[str],
              target_refs: List[str],
-             message: str = None,
-             cwd: str = None,
+             message: Optional[str] = None,
+             cwd: Optional[str] = None,
              ) -> str:
     """
-    <message> is used as the commit message.
+    `message` is used as the commit message.
     """
     new_tree = snap_tree(cwd=cwd)
     parent_commits = [c for c in [get_commit(p, cwd=cwd) for p in parent_refs] if c]
@@ -176,29 +176,28 @@ def snap_ref(parent_refs: List[str],
     return commit
 
 
-
-def snap(parent_refs: List[str] = None,
-         target_refs: List[str] = None,
-         message: str = None,
-         cwd: str = None,
+def snap(parent_refs: Optional[List[str]] = None,
+         target_refs: Optional[List[str]] = None,
+         message: Optional[str] = None,
+         cwd: Optional[str] = None,
          ) -> str:
     """
     Create a new commit of all non-ignored files in the repository.
 
-    <parent_refs> default to ['HEAD'].
-    If there are any symbolic refs in <parent_refs>, the refs
+    `parent_refs` default to `['HEAD']`.
+    If there are any symbolic refs in `parent_refs`, the refs
         they point to are added to <parent_refs>.
 
-    All commits pointed to by existing <parent_refs> and <target_refs>,
+    All commits pointed to by existing `parent_refs` and `target_refs`,
         become parents of the newly created commit.
 
-    <target_refs> are created/updated to point the commit.
+    `target_refs` are created/updated to point the commit.
         Default is
             'refs/lethe/head_name' for each parent ref of the form
                 'refs/heads/head_name', and
             'refs/lethe/path/to/ref' for each parent ref of the form
                 'refs/path/to/ref'.
-    <message> is used as the commit message.
+    `message` is used as the commit message.
     """
     if parent_refs is None:
         parent_refs = ['HEAD']
