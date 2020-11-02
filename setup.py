@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
-with open('README.md', 'r') as f:
+
+with open('README.md', 'rt') as f:
     long_description = f.read()
 
+with open('lethe/VERSION.py', 'rt') as f:
+    version = f.readlines()[2].strip()
+
 setup(name='lethe',
-      version='0.8',
+      version=version,
       description='Git-based snapshotting',
       long_description=long_description,
       long_description_content_type='text/markdown',
       author='Jan Petykiewicz',
       author_email='anewusername@gmail.com',
-      py_modules=['lethe'],
+      url='https://mpxd.net/code/jan/lethe',
+      packages=find_packages(),
+      package_data={
+          'lethe': ['py.typed'],
+      },
       entry_points={
           'console_scripts': [
               'lethe=lethe:main',
@@ -21,7 +29,6 @@ setup(name='lethe',
       install_requires=[
             'typing',
       ],
-      url='https://mpxd.net/code/jan/lethe',
       keywords=[
             'git',
             'snapshot',

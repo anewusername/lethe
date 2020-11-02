@@ -12,10 +12,6 @@ from itertools import chain
 import sys
 
 
-__author__ = 'Jan Petykeiwicz'
-__version__ = '0.8'
-
-
 def _run(command: Union[str, List[str]], **kwargs) -> str:
     """
     Wrapper for subprocess.run():
