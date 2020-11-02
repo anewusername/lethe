@@ -1,6 +1,10 @@
-build/
-dist/
-
-*.egg-info/
 __pycache__/
 *.pyc
+
+.*.swp
+.*.swo
+
+build/
+dist/
+*.egg-info/
+.mypy_cache
