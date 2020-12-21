@@ -23,7 +23,9 @@ setup(name='lethe',
       },
       entry_points={
           'console_scripts': [
-              'lethe=lethe:main',
+              'lethe=lethe:endpoints.main',
+              'lethe-push=lethe:endpoints.push',
+              'lethe-fetch=lethe:endpoints.fetch',
           ],
       },
       install_requires=[

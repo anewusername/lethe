@@ -110,6 +110,34 @@ def update_ref(target_ref: str,
     return result_ref
 
 
+def push_ref(remote: str = 'origin',
+             target_ref: str = 'refs/lethe/HEAD',
+             remote_ref: Optional[str] = None,
+             cwd: Optional[str] = None,
+             ) -> str:
+    """
+    Push `target_ref` to `remote` as `remote_ref`.
+    By default, `remote_ref` will be the same as `target_ref`.
+    """
+    if remote_ref is None:
+        remote_ref = target_ref
+    return _run(['git', 'push', remote, target_ref + ':' + remote_ref], cwd=cwd)
+
+
+def fetch_ref(remote: str = 'origin',
+              remote_ref: str = 'refs/lethe/HEAD',
+              target_ref: Optional[str] = None,
+              cwd: Optional[str] = None,
+              ) -> str:
+    """
+    Fetch `remote_ref` from `remote` as `target_ref`.
+    By default, `target_ref` will be the same as `remote_ref`.
+    """
+    if target_ref is None:
+        target_ref = remote_ref
+    return _run(['git', 'fetch', remote, remote_ref + ':' + target_ref], cwd=cwd)
+
+
 def deref_symref(ref: str, cwd: Optional[str] = None) -> str:
     """
     Dereference a symbolic ref
@@ -214,24 +242,3 @@ def snap(parent_refs: Optional[List[str]] = None,
 
     commit = snap_ref(parent_refs, target_refs, message=message, cwd=cwd)
     return commit
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--parent', '-p', action='append', default=['HEAD'])
-    parser.add_argument('--target', '-t', action='append')
-    parser.add_argument('--message', '-m')
-    parser.add_argument('--repo', '-r')
-
-    args = parser.parse_args()
-
-    print(snap(parent_refs=args.parent,
-               target_refs=args.target,
-               message=args.message,
-               cwd=args.repo))
-    return 0
-
-
-if __name__ == '__main__':
-    main()
-
