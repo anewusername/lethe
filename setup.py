@@ -9,6 +9,7 @@ with open('README.md', 'rt') as f:
 with open('lethe/VERSION.py', 'rt') as f:
     version = f.readlines()[2].strip()
 
+
 setup(name='lethe',
       version=version,
       description='Git-based snapshotting',
@@ -43,7 +44,6 @@ setup(name='lethe',
             'traceability',
       ],
       classifiers=[
-            'Programming Language :: Python',
             'Programming Language :: Python :: 3',
             'Development Status :: 4 - Beta',
             'Environment :: Other Environment',
