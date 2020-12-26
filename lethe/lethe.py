@@ -287,6 +287,15 @@ def snap(parent_refs: Optional[Sequence[str]] = None,
             target_refs += [target_base + '/LATEST',
                             target_base + '/' + date_ref]
 
+            # Auto-migrate old commits to work with the new scheme
+            old_base_commit = get_commit(target_base, cwd=cwd)
+            if old_base_commit:
+                print(f'Migrating {target_base} to new naming scheme...')
+                _run('git update-ref -d ' + target_base)
+                update_ref(target_base + '/LEGACY', old_base_commit,
+                           message='last commit using old refs/lethe/branchname approach')
+
+
     if message is None:
         message = 'snapshot ' + date_str
 
