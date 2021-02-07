@@ -22,7 +22,7 @@ def main() -> int:
 def push() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--remote', '-s', default='origin')
-    parser.add_argument('--target', '-t', default='refs/lethe/HEAD')
+    parser.add_argument('--target', '-t', default='refs/lethe/LATEST')
     parser.add_argument('--repo', '-r')
 
     args = parser.parse_args()
@@ -36,7 +36,7 @@ def push() -> int:
 def fetch() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--remote', '-s', default='origin')
-    parser.add_argument('--target', '-t', default='refs/lethe/HEAD')
+    parser.add_argument('--target', '-t', default='refs/lethe/LATEST')
     parser.add_argument('--repo', '-r')
 
     args = parser.parse_args()
