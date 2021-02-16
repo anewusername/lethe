@@ -139,7 +139,7 @@ def push_ref(remote: str = 'origin',
     """
     if remote_ref is None:
         remote_ref = target_ref
-    return _run(['git', 'push', remote, target_ref + ':' + remote_ref], cwd=cwd)
+    return _run(['git', 'push', '--force', remote, target_ref + ':' + remote_ref], cwd=cwd)
 
 
 def fetch_ref(remote: str = 'origin',
@@ -163,7 +163,7 @@ def fetch_ref(remote: str = 'origin',
     """
     if target_ref is None:
         target_ref = remote_ref
-    return _run(['git', 'fetch', remote, remote_ref + ':' + target_ref], cwd=cwd)
+    return _run(['git', 'fetch', '--force', remote, remote_ref + ':' + target_ref], cwd=cwd)
 
 
 def deref_symref(ref: str,
