@@ -11,4 +11,4 @@ from .lethe import (
 from .endpoints import main
 
 __author__ = 'Jan Petykeiwicz'
-__version__ = '0.12'
+__version__ = '0.13'
