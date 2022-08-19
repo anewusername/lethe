@@ -9,7 +9,6 @@ from .lethe import (
     )
 
 from .endpoints import main
-from .VERSION import __version__
-
 
 __author__ = 'Jan Petykeiwicz'
+__version__ = '0.12'
