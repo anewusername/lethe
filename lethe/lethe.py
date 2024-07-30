@@ -3,7 +3,7 @@
 Git snapshotting tool
 """
 
-from typing import Sequence, Union, Optional
+from typing import Sequence
 import subprocess
 import tempfile
 import datetime
@@ -11,7 +11,7 @@ import argparse
 from itertools import chain
 
 
-def _run(command: Union[str, Sequence[str]], **kwargs) -> str:
+def _run(command: str | Sequence[str], **kwargs) -> str:
     """
     Wrapper for `subprocess.run()`:
 
@@ -34,7 +34,7 @@ def _run(command: Union[str, Sequence[str]], **kwargs) -> str:
     return result.stdout.decode().strip()
 
 
-def get_latest_commit(short: bool = True, cwd: Optional[str] = None) -> str:
+def get_latest_commit(short: bool = True, cwd: str | None = None) -> str:
     """
     Get the most recent commit's hash.
     This includes non-lethe commits.
@@ -43,14 +43,14 @@ def get_latest_commit(short: bool = True, cwd: Optional[str] = None) -> str:
     return _run(f'git log --all -1 --format=%{fmt}', cwd=cwd)
 
 
-def shorten_hash(sha: str, cwd: Optional[str] = None) -> str:
+def shorten_hash(sha: str, cwd: str | None = None) -> str:
     """
     Get the short version of a hash
     """
     return _run(f'git rev-parse --short {sha}', cwd=cwd)
 
 
-def get_root(cwd: Optional[str] = None) -> str:
+def get_root(cwd: str | None = None) -> str:
     """
     Get the root directory of a git repository
     """
@@ -60,7 +60,7 @@ def get_root(cwd: Optional[str] = None) -> str:
     return root
 
 
-def get_obj(ref: str, cwd: Optional[str] = None) -> str:
+def get_obj(ref: str, cwd: str | None = None) -> str:
     """
     Transform a ref into its corresponding hash using git-rev-parse
     """
@@ -68,25 +68,26 @@ def get_obj(ref: str, cwd: Optional[str] = None) -> str:
     return sha
 
 
-def get_commit(ref: str, cwd: Optional[str] = None) -> str:
+def get_commit(ref: str, cwd: str | None = None) -> str:
     """
     Transform a ref to a commit into its corresponding hash using git-rev-parse
     """
     return get_obj(ref, cwd=cwd)
 
 
-def get_tree(ref: str, cwd: Optional[str] = None) -> str:
+def get_tree(ref: str, cwd: str | None = None) -> str:
     """
     Take a ref to a commit, and return the hash of the tree it points to
     """
     return get_obj(ref + ':', cwd=cwd)
 
 
-def commit_tree(tree: str,
-                parents: Sequence[str],
-                message: Optional[str] = None,
-                cwd: Optional[str] = None,
-                ) -> str:
+def commit_tree(
+        tree: str,
+        parents: Sequence[str],
+        message: str | None = None,
+        cwd: str | None = None,
+        ) -> str:
     """
     Create a commit pointing to the given tree, with the specified parent commits and message.
     Return the hash of the created commit.
@@ -99,13 +100,14 @@ def commit_tree(tree: str,
     return commit
 
 
-def update_ref(target_ref: str,
-               target_commit: str,
-               old_commit: Optional[str] = None,
-               *,
-               message: str = 'new snapshot',
-               cwd: Optional[str] = None,
-               ) -> str:
+def update_ref(
+        target_ref: str,
+        target_commit: str,
+        old_commit: str | None = None,
+        *,
+        message: str = 'new snapshot',
+        cwd: str | None = None,
+        ) -> str:
     """
     Update `target_ref` to point to `target_commit`, optionally verifying that
         it points `old_commit` before the update.
@@ -118,12 +120,13 @@ def update_ref(target_ref: str,
     return result_ref
 
 
-def push_ref(remote: str = 'origin',
-             target_ref: str = 'refs/lethe/LATEST',
-             remote_ref: Optional[str] = None,
-             *,
-             cwd: Optional[str] = None,
-             ) -> str:
+def push_ref(
+        remote: str = 'origin',
+        target_ref: str = 'refs/lethe/LATEST',
+        remote_ref: str | None = None,
+        *,
+        cwd: str | None = None,
+        ) -> str:
     """
     Push `target_ref` to `remote` as `remote_ref`.
     By default, `remote_ref` will be the same as `target_ref`.
@@ -142,12 +145,13 @@ def push_ref(remote: str = 'origin',
     return _run(['git', 'push', '--force', remote, target_ref + ':' + remote_ref], cwd=cwd)
 
 
-def fetch_ref(remote: str = 'origin',
-              remote_ref: str = 'refs/lethe/LATEST',
-              target_ref: Optional[str] = None,
-              *,
-              cwd: Optional[str] = None,
-              ) -> str:
+def fetch_ref(
+        remote: str = 'origin',
+        remote_ref: str = 'refs/lethe/LATEST',
+        target_ref: str | None = None,
+        *,
+        cwd: str | None = None,
+        ) -> str:
     """
     Fetch `remote_ref` from `remote` as `target_ref`.
     By default, `target_ref` will be the same as `remote_ref`.
@@ -166,20 +170,22 @@ def fetch_ref(remote: str = 'origin',
     return _run(['git', 'fetch', '--force', remote, remote_ref + ':' + target_ref], cwd=cwd)
 
 
-def deref_symref(ref: str,
-                 *,
-                 cwd: Optional[str] = None,
-                 ) -> str:
+def deref_symref(
+        ref: str,
+        *,
+        cwd: str | None = None,
+        ) -> str:
     """
     Dereference a symbolic ref
     """
     return _run(['git', 'symbolic-ref', '--quiet', ref], cwd=cwd)
 
 
-def find_merge_base(commits: Sequence[str],
-                    *,
-                    cwd: Optional[str] = None,
-                    ) -> str:
+def find_merge_base(
+        commits: Sequence[str],
+        *,
+        cwd: str | None = None,
+        ) -> str:
     """
     Find the "best common ancestor" commit.
 
@@ -200,7 +206,7 @@ def find_merge_base(commits: Sequence[str],
     return base
 
 
-def snap_tree(*, cwd: Optional[str] = None) -> str:
+def snap_tree(*, cwd: str | None = None) -> str:
     """
     Create a new tree, consisting of all non-ignored files in the repository.
     Return the hash of the tree.
@@ -214,12 +220,13 @@ def snap_tree(*, cwd: Optional[str] = None) -> str:
     return tree
 
 
-def snap_ref(parent_refs: Sequence[str],
-             target_refs: Sequence[str],
-             message: Optional[str] = None,
-             *,
-             cwd: Optional[str] = None,
-             ) -> str:
+def snap_ref(
+        parent_refs: Sequence[str],
+        target_refs: Sequence[str],
+        message: str | None = None,
+        *,
+        cwd: str | None = None,
+        ) -> str:
     """
     `message` is used as the commit message.
     """
@@ -227,7 +234,7 @@ def snap_ref(parent_refs: Sequence[str],
     parent_commits = [c for c in [get_commit(p, cwd=cwd) for p in parent_refs] if c]
     old_commits = [get_commit(t, cwd=cwd) for t in target_refs]
 
-    commit = commit_tree(new_tree, set(parent_commits), message, cwd=cwd)
+    commit = commit_tree(new_tree, list(set(parent_commits)), message, cwd=cwd)
 
     for target_ref, old_commit in zip(target_refs, old_commits):
         # update ref to point to commit, or create new ref
@@ -237,12 +244,13 @@ def snap_ref(parent_refs: Sequence[str],
     return commit
 
 
-def snap(parent_refs: Optional[Sequence[str]] = None,
-         target_refs: Optional[Sequence[str]] = None,
-         message: Optional[str] = None,
-         *,
-         cwd: Optional[str] = None,
-         ) -> str:
+def snap(
+        parent_refs: Sequence[str] | None = None,
+        target_refs: Sequence[str] | None = None,
+        message: str | None = None,
+        *,
+        cwd: str | None = None,
+        ) -> str:
     """
     Create a new commit, containing all non-ignored files.
 
